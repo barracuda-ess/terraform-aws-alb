@@ -24,8 +24,18 @@ output "origin_id" {
 }
 
 output "security_group_id" {
-  description = "The ID of the security group."
+  description = "The ID of the main security group."
   value       = concat(aws_security_group.main[*].id, [""])[0]
+}
+
+output "cloudfront_g_security_group_id" {
+  description = "The ID of the cloudfront_g security group."
+  value       = concat(aws_security_group.cloudfront_g[*].id, [""])[0]
+}
+
+output "cloudfront_r_security_group_id" {
+  description = "The ID of the cloudfront_r security group."
+  value       = concat(aws_security_group.cloudfront_r[*].id, [""])[0]
 }
 
 output "arn_suffix" {
