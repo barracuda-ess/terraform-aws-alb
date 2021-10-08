@@ -8,7 +8,11 @@ resource "aws_lb" "main" {
   load_balancer_type = var.load_balancer_type
   internal           = var.internal
   subnets            = var.subnets
-  security_groups    = aws_security_group.main.*.id
+  security_groups    = concat(
+                         aws_security_group.main.*.id,
+                         aws_security_group.cloudfront_g.*.id,
+                         aws_security_group.cloudfront_r.*.id
+                       )
 
   idle_timeout                     = var.idle_timeout
   enable_deletion_protection       = var.enable_deletion_protection
@@ -77,6 +81,47 @@ resource "aws_security_group" "main" {
     var.tags,
     {
       "Name" = "${local.name_prefix}-sg"
+    },
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group" "cloudfront_g" {
+  count       = var.load_balancer_type == "network" ? 0 : 1
+  name_prefix = "${local.name_prefix}-cloudfront-g-sg-"
+  description = var.description
+  vpc_id      = var.vpc_id
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" = "cloudfront_g",
+      "AutoUpdate" = "true",
+      "Protocol" = "https"
+    },
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+resource "aws_security_group" "cloudfront_r" {
+  count       = var.load_balancer_type == "network" ? 0 : 1
+  name_prefix = "${local.name_prefix}-cloudfront-r-sg-"
+  description = var.description
+  vpc_id      = var.vpc_id
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" = "cloudfront_r",
+      "AutoUpdate" = "true",
+      "Protocol" = "https"
     },
   )
 
