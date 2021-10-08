@@ -8,10 +8,11 @@ resource "aws_lb" "main" {
   load_balancer_type = var.load_balancer_type
   internal           = var.internal
   subnets            = var.subnets
-  security_groups    = [ aws_security_group.main.*.id,
+  security_groups    = concat(
+                         aws_security_group.main.*.id,
                          aws_security_group.cloudfront_g.*.id,
                          aws_security_group.cloudfront_r.*.id
-                       ]
+                       )
 
   idle_timeout                     = var.idle_timeout
   enable_deletion_protection       = var.enable_deletion_protection
